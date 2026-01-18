@@ -1,0 +1,8 @@
+.vscode
+Frontend/node_modules
+Backend/node_modules
+.Ds_Store
+Backend/.env
+Frontend/.env
+*.log
+*.sqlite3
