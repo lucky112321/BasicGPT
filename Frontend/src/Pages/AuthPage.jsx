@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
-import "./AuthPage.css";
+import "./Authpage.css";
 import server from "../environment.js";
 
 
