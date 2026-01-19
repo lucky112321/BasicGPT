@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import "./AuthPage.css";
+import server from "../environment.js";
 
 
 const AuthPage = () => {
@@ -10,9 +11,10 @@ const AuthPage = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
+
     const { login } = useAuth();
 
-    const API_URL = "http://localhost:8080/auth";
+    const API_URL = `${server}/auth`;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
