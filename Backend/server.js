@@ -16,6 +16,12 @@ app.use(cors());
 
 const PORT = 8080;
 
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    console.log(`Mongoose readyState: ${mongoose.connection.readyState} (0=disconnected, 1=connected, 2=connecting, 3=disconnecting)`);
+    next();
+});
+
 app.use("/auth", authRoutes);
 app.use("/api", chatRoutes);
 
@@ -38,20 +44,33 @@ app.use("/api", chatRoutes);
 //     res.send(registeredUser)
 // })
 
-app.listen(PORT, () => {
-    console.log(`server running on ${PORT}`);
-    connectDB();
-});
-
 const connectDB = async () => {
     try {
+        // Enable mongoose debug mode to see what it's doing
+        mongoose.set("debug", true);
+
+        mongoose.connection.on('connected', () => console.log("Mongoose connected to DB"));
+        mongoose.connection.on('error', (err) => console.log("Mongoose connection error:", err));
+        mongoose.connection.on('disconnected', () => console.log("Mongoose disconnected"));
+
         await mongoose.connect(process.env.MONGODB_URI);
         console.log("Connected with Database!");
+
+        // Immediate verify: Try to list collections
+        const collections = await mongoose.connection.db.listCollections().toArray();
+        console.log("Verified! Available collections:", collections.map(c => c.name));
+
     } catch (err) {
         console.log("Failed to connect with DB", err);
+        process.exit(1);
     }
-
 }
+
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`server running on ${PORT}`);
+    });
+});
 
 
 

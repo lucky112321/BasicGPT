@@ -1,9 +1,6 @@
-let IS_PROD = true;
-
-const server = IS_PROD ?
+const server = import.meta.env.PROD ?
     "https://basicgpt-backend.onrender.com" :
-
-    "http://localhost:8080"
+    "http://localhost:8080";
 
 
 
