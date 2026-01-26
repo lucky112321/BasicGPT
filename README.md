@@ -1,5 +1,5 @@
 
-🤖 AI Chat Application (ChatGPT-Inspired)
+🤖 **AI Chat Application** (ChatGPT-Inspired)
 
 A full-stack AI-powered chat application inspired by ChatGPT, built to provide real-time intelligent responses using the ChatGPT API. The platform supports secure authentication, persistent chat history, and a smooth conversational experience.
 
