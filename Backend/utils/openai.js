@@ -1,29 +1,27 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const getOpenAIAPIResponse = async (message) => {
-    const options = {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [{
-                role: "user",
-                content: message
-            }]
-        })
-    };
+dotenv.config();
+
+const getGeminiResponse = async (message) => {
+    // Support both naming conventions just in case
+    const apiKey = process.env.GEMINI_API_KEY || process.env.Gemini_API_KEY;
+
+    if (!apiKey || apiKey.includes("PASTE_YOUR_KEY_HERE")) {
+        throw new Error("Invalid or missing GEMINI_API_KEY in .env file. Please replace the placeholder with your actual key.");
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     try {
-        const respons = await fetch("https://api.openai.com/v1/chat/completions", options);
-        const data = await respons.json();
-        return data.choices[0].message.content;
-
+        const result = await model.generateContent(message);
+        const response = await result.response;
+        return response.text();
     } catch (err) {
-        console.log(err);
+        console.error("Gemini API Error:", err);
+        throw err;
     }
 };
 
-export default getOpenAIAPIResponse;
+export default getGeminiResponse;

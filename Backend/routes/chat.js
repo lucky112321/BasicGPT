@@ -1,7 +1,6 @@
 import express from "express";
 import Thread from "../models/Thread.js";
-import getOpenAIAPIResponse from "../utils/openai.js"
-
+import getGeminiResponse from "../utils/openai.js"
 const router = express.Router();
 
 router.post("/test", async (req, res) => {
@@ -90,7 +89,18 @@ router.post("/chat", async (req, res) => {
             thread.messages.push({ role: "user", content: message })
         }
 
-        const assistantReply = await getOpenAIAPIResponse(message);
+        let assistantReply;
+        try {
+            assistantReply = await getGeminiResponse(message);
+        } catch (apiError) {
+            console.error("Failed to get response from Gemini:", apiError);
+            return res.status(502).json({ error: "Failed to generate response from AI service" });
+        }
+
+        if (!assistantReply) {
+            return res.status(500).json({ error: "Received empty response from AI service" });
+        }
+
         console.log("Assistant reply:", assistantReply);
         thread.messages.push({ role: "assistant", content: assistantReply });
         thread.updatedAt = new Date();
@@ -98,8 +108,8 @@ router.post("/chat", async (req, res) => {
         await thread.save();
         res.json({ reply: assistantReply });
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "somthing went wrong" })
+        console.log("Server Error:", err);
+        res.status(500).json({ error: "Internal Server Error" })
     }
 });
 
